@@ -1,0 +1,28 @@
+pipeline{
+    agent any
+    environment {
+        PATH= "$PATH:/opt/maven/bin"
+    }
+    stages {
+        stage('GetCode'){
+            steps{
+                git branch: 'main', url: 'https://github.com/KrishnappaL/Tweet-Trend-main.git'
+            }
+        }
+        stage('Build'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
+        stage('Sonarqube analysis'){
+            //def scannerHome=tool 'SonarqubeScanner';
+            steps {
+                withSonarQubeEnv('sonarqube-9.9'){
+                    //If you have configured more than one global connection,you can specify its name
+                    //   sh "${scannerHome}/bin/sonar-scanner"
+                    sh "mvn sonar:sonar"
+                }
+            }
+        }
+    }
+}
